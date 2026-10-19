@@ -2,6 +2,14 @@
 <html lang="it" data-theme="light">
 <head>
  <link rel="manifest" href="/pochette-budgeting/pochette-manifest.json">
+ <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/pochette-budgeting/sw.js")
+        .catch((error) => console.error("Errore Service Worker:", error));
+    });
+  }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pochette — Budget & Finanze</title>
