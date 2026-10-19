@@ -962,14 +962,6 @@ async function activateLicense() {
     return;
   }
 
-  if (input === MASTER_KEY) {
-    localStorage.setItem("pochette_activated", "true");
-    document.getElementById("licenseOverlay").style.display = "none";
-    checkInitialState();
-    alert("Applicazione sbloccata con Chiave Master!");
-    return;
-  }
-
   if (!GOOGLE_SCRIPT_URL) {
     msgEl.style.color = "var(--danger)";
     msgEl.textContent = "Inserisci l'URL del tuo Google Script.";
