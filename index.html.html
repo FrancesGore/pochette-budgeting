@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pochette — Budget & Finanze</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: linear-gradient(135deg, #fdf8fb 0%, #faedf3 100%);
+  --panel: #ffffff;
+  --text: #3c2e42;
+  --muted: #8b7996;
+  --border: #e8a8c5;
+  --accent: #a872cc;
+  --accent-light: #f3e9f9;
+  --pink: #e87a90;
+  --pink-light: #fde8ed;
+  --blue: #5b9bd5;
+  --blue-light: #e8f3fc;
+  --danger: #e25b75;
+  --success: #4ea892;
+  --shadow: rgba(232, 122, 144, 0.12);
+  --input-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: linear-gradient(135deg, #18121e 0%, #221526 100%);
+  --panel: #261a2e;
+  --text: #f3e9f9;
+  --muted: #a692b5;
+  --border: #824768;
+  --accent: #c084fc;
+  --accent-light: #382247;
+  --pink: #f472b6;
+  --pink-light: #3d1e2e;
+  --blue: #7dd3fc;
+  --blue-light: #1e3a5f;
+  --danger: #f87171;
+  --success: #34d399;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --input-bg: #1e1424;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; transition: all 0.2s ease; }
+.app { max-width: 1100px; margin: auto; padding: 24px; }
+
+header {
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.brand-container { display: flex; align-items: center; gap: 12px; }
+.brand-logo { width: 52px; height: 52px; flex-shrink: 0; }
+.brand { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--accent); }
+.subtitle, .muted { color: var(--muted); font-size: 13px; }
+
+nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; align-items: center; }
+button, .button {
+  border: 2px solid var(--border); background: var(--panel);
+  color: var(--text); border-radius: 12px; padding: 10px 16px;
+  font-weight: 600;
+}
+button:hover { background: var(--pink-light); border-color: var(--pink); }
+button.active, button.primary {
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  color: #fff; border: none; box-shadow: 0 4px 12px var(--shadow);
+}
+button.primary:hover { opacity: 0.95; }
+button.danger { color: var(--danger); border-color: var(--pink); }
+button.small { padding: 5px 9px; font-size: 12px; border-radius: 8px; }
+
+.theme-toggle {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--panel); border: 2px solid var(--border);
+  font-size: 13px; font-weight: 600;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.charts-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+
+.panel, .metric {
+  background: var(--panel); 
+  border: 2px solid var(--border);
+  border-radius: 20px; padding: 20px; min-width: 0;
+  box-shadow: 0 4px 18px var(--shadow);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.metric .label { color: var(--muted); font-size: 13px; font-weight: 500; }
+.metric .value { font-size: clamp(22px, 3vw, 30px); font-weight: 800; margin: 7px 0; color: var(--text); }
+
+h2 { font-size: 22px; margin: 8px 0 16px; color: var(--accent); }
+h3 { font-size: 16px; margin: 0 0 12px; color: var(--text); }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 24px 0 12px; }
+
+form { display: grid; gap: 14px; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 500; }
+input, select {
+  width: 100%; min-width: 0; padding: 11px;
+  border: 2px solid var(--border); border-radius: 12px;
+  background: var(--input-bg); color: var(--text); outline: none;
+}
+input:focus, select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-light); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 12px 8px; border-bottom: 1.5px solid var(--border); }
+th { color: var(--muted); font-weight: 600; }
+td:last-child, th:last-child { text-align: right; }
+.scroll { overflow-x: auto; }
+
+.positive { color: var(--blue) !important; font-weight: 700; }
+.negative { color: var(--pink) !important; font-weight: 700; }
+
+.notice { padding: 14px 16px; border-radius: 14px; background: var(--pink-light); color: var(--text); margin: 10px 0; border: 2px solid var(--border); }
+.bar { height: 10px; border-radius: 20px; background: var(--accent-light); overflow: hidden; margin: 8px 0; border: 1px solid var(--border); }
+.bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--pink)); }
+.bar.danger > div { background: var(--pink); }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.empty { color: var(--muted); padding: 20px 0; text-align: center; }
+footer { margin: 32px 0 12px; color: var(--muted); font-size: 12px; text-align: center; }
+
+.privacy-box {
+  background: var(--bg); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px; font-size: 13px;
+  color: var(--muted); max-height: 160px; overflow-y: auto; line-height: 1.4;
+}
+
+.chart-container {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 10px 0; overflow-x: auto; width: 100%;
+}
+.chart-legend {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 10px 14px; margin-bottom: 16px; font-size: 12px; font-weight: 600;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+#lockOverlay, #privacyOverlay, #licenseOverlay, .modal-backdrop {
+  position: fixed; inset: 0; background: rgba(24, 18, 30, 0.92); z-index: 9999;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.lock-box, .modal-box, .license-box {
+  background: var(--panel); border: 2px solid var(--border);
+  padding: 28px; border-radius: 24px; text-align: center; max-width: 480px; width: 100%;
+  box-shadow: 0 12px 32px var(--shadow);
+}
+
+#printReportArea { display: none; }
+@media print {
+  @page { margin: 10mm; }
+  body * { visibility: hidden; }
+  #printReportArea, #printReportArea * { visibility: visible; }
+  #printReportArea {
+    display: block !important;
+    position: absolute; left: 0; top: 0; width: 100%;
+    background: #ffffff !important; color: #000000 !important;
+    padding: 10px; font-family: sans-serif;
+  }
+  .no-print { display: none !important; }
+}
+
+@media(max-width:900px) { .charts-grid { grid-template-columns: 1fr; } }
+@media(max-width:760px) {
+  .app { padding: 16px; }
+  .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .two { grid-template-columns: 1fr; }
+}
+@media(max-width:420px) {
+  .fields { grid-template-columns: 1fr; }
+  .metric { padding: 14px; }
+  .metric .value { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<datalist id="descSuggestions"></datalist>
+<datalist id="tagSuggestions"></datalist>
+
+<!-- SCHERMATA ATTIVAZIONE LICENZA -->
+<div id="licenseOverlay" style="display:none;">
+  <div class="license-box">
+    <div class="brand-logo" style="margin: 0 auto 12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+        <defs>
+          <linearGradient id="noteGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C084FC" /><stop offset="50%" stop-color="#7DD3FC" /><stop offset="100%" stop-color="#F472B6" />
+          </linearGradient>
+          <linearGradient id="pochetteGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7E22CE" /><stop offset="100%" stop-color="#581C87" />
+          </linearGradient>
+          <linearGradient id="goldGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FDE047" /><stop offset="100%" stop-color="#CA8A04" />
+          </linearGradient>
+        </defs>
+        <g>
+          <polygon points="45,30 47.5,36 54,36.5 49,41 50.5,47.5 45,44 39.5,47.5 41,41 36,36.5 42.5,36" fill="url(#goldGradL)" />
+          <polygon points="100,18 103.5,26 112,27 105.5,33 107.5,41.5 100,37 92.5,41.5 94.5,33 88,27 96.5,26" fill="url(#goldGradL)" />
+          <polygon points="155,32 157.5,38 164,38.5 159,43 160.5,49.5 155,46 149.5,49.5 151,43 146,38.5 152.5,38" fill="url(#goldGradL)" />
+          <g transform="rotate(-12 100 85)">
+            <rect x="65" y="55" width="70" height="38" rx="4" fill="url(#noteGradL)" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="100" cy="74" r="7" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.8" />
+            <path d="M 72 63 L 78 63 M 122 85 L 128 85" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+          </g>
+          <g>
+            <rect x="40" y="85" width="120" height="75" rx="20" fill="url(#pochetteGradL)" />
+            <path d="M 40 95 Q 100 135 160 95 L 160 85 Q 100 120 40 85 Z" fill="#6B21A8" opacity="0.5" />
+            <path d="M 40 85 Q 100 125 160 85 L 160 92 Q 100 132 40 92 Z" fill="url(#pochetteGradL)" />
+            <circle cx="100" cy="108" r="5.5" fill="url(#goldGradL)" />
+            <circle cx="100" cy="108" r="2.5" fill="#581C87" opacity="0.3" />
+            <rect x="44" y="89" width="112" height="67" rx="16" fill="none" stroke="#A855F7" stroke-width="1" stroke-dasharray="3,3" opacity="0.4" />
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="brand" style="margin-bottom:6px;">Pochette.</div>
+    <p class="muted" style="margin-bottom:16px;">Inserisci il tuo codice di attivazione per sbloccare l'applicazione.</p>
+    
+    <input type="text" id="licenseKeyInput" placeholder="es. A1B2-C3D4" style="text-align:center; font-size:18px; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;" maxlength="20">
+    
+    <details style="margin-bottom:14px; text-align:left; font-size:12px; color:var(--muted);">
+      <summary style="cursor:pointer; font-weight:600;">Configura URL Google Apps Script</summary>
+      <input type="url" id="scriptUrlInput" placeholder="Incolla URL Web App Google Script" style="margin-top:8px; font-size:12px;">
+    </details>
+
+    <button class="primary" style="width:100%; padding:12px; font-size:15px;" id="activateBtn" onclick="activateLicense()">Attiva Applicazione</button>
+    <div id="licenseMsg" style="margin-top:12px; font-size:13px; font-weight:600;"></div>
+  </div>
+</div>
+
+<!-- CONTENITORE PER LA STAMPA PDF PULITA -->
+<div id="printReportArea">
+  <div style="text-align:center; margin-bottom:20px;">
+    <h1 style="color:#7E22CE; margin:0;">Pochette Report Finanziario</h1>
+    <p id="printDate" style="color:#555; font-size:12px; margin:4px 0;"></p>
+  </div>
+  <h3>Panoramica Generale</h3>
+  <div id="printOverviewContent" style="margin-bottom:20px; font-size:14px;"></div>
+  <h3>Storico Completo Movimenti</h3>
+  <div id="printTransactionsContent"></div>
+</div>
+
+<!-- OVERLAY ACCETTAZIONE PRIVACY AL PRIMO AVVIO -->
+<div id="privacyOverlay" style="display:none">
+  <div class="lock-box" style="text-align:left;">
+    <div style="text-align:center; margin-bottom:12px;">
+      <div class="brand">Pochette.</div>
+      <div class="subtitle" data-i18n="tagline">Il tuo denaro, in perfetta armonia.</div>
+    </div>
+    <h3 style="color:var(--accent); margin-bottom:10px;" data-i18n="privacyModalTitle">Benvenuta! Informativa sulla Privacy</h3>
+    <div class="privacy-box" style="margin-bottom:14px;" data-i18n="privacyText">
+      Pochette tutela la tua riservatezza. Tutti i dati finanziari, i conti e i movimenti inseriti vengono memorizzati esclusivamente in locale sul tuo browser. Nessun dato personale viene inviato a server esterni.
+    </div>
+    <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; color:var(--text); font-size:13px; margin-bottom:16px;">
+      <input type="checkbox" id="initialPrivacyCheck" style="width:auto; margin-top:2px; cursor:pointer;">
+      <span data-i18n="privacyAccept">Ho letto e accetto l'informativa sulla privacy e l'archiviazione locale dei dati</span>
+    </label>
+    <button class="primary" style="width:100%" onclick="acceptInitialPrivacy()" data-i18n="continueApp">Accetta e Continua</button>
+  </div>
+</div>
+
+<!-- OVERLAY LOCK PIN -->
+<div id="lockOverlay" style="display:none">
+  <div class="lock-box">
+    <div class="brand" style="margin-bottom:8px;">Pochette</div>
+    <p class="muted" data-i18n="lockPrompt">Inserisci il PIN di protezione per accedere</p>
+    <input type="password" id="pinInput" placeholder="PIN" style="text-align:center; font-size:20px; margin: 14px 0;">
+    <button class="primary" style="width:100%" onclick="unlockApp()" data-i18n="unlock">Sblocca</button>
+  </div>
+</div>
+
+<!-- MODALI DI EDITING -->
+<div id="editTxModal" class="modal-backdrop" style="display:none">
+  <div class="modal-box" style="text-align:left;">
+    <h3 style="color:var(--accent); margin-bottom:16px;" data-i18n="editTxTitle">Modifica Movimento</h3>
+    <form id="editTxForm" onkeydown="preventEnterSubmit(event)">
+      <input type="hidden" id="editTxId">
+      <div class="fields">
+        <label><span data-i18n="type">Tipo</span>
+          <select id="editTxType" onchange="refreshEditCategories()">
+            <option value="expense" data-i18n="expense">Uscita</option>
+            <option value="income" data-i18n="income">Entrata</option>
+          </select>
+        </label>
+        <label><span data-i18n="account">Conto</span><select id="editTxAccount"></select></label>
+        <label><span data-i18n="amount">Importo</span><input id="editTxAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required></label>
+        <label><span data-i18n="date">Data</span><input id="editTxDate" type="date" required></label>
+        <label><span data-i18n="category">Categoria</span><select id="editTxCategory"></select></label>
+        <label><span data-i18n="tag">Tag</span><input id="editTxTag" list="tagSuggestions" placeholder="#shopping"></label>
+      </div>
+      <label><span data-i18n="description">Descrizione</span><input id="editTxDescription" list="descSuggestions" maxlength="120"></label>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button type="button" onclick="closeModal('editTxModal')" data-i18n="cancel">Annulla</button>
+        <button class="primary" type="button" onclick="saveEditedTransaction()" data-i18n="save">Salva Modifiche</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="editDueModal" class="modal-backdrop" style="display:none">
+  <div class="modal-box" style="text-align:left;">
+    <h3 style="color:var(--accent); margin-bottom:16px;" data-i18n="editDueTitle">Modifica Scadenza</h3>
+    <form id="editDueForm" onkeydown="preventEnterSubmit(event)">
+      <input type="hidden" id="editDueId">
+      <label><span data-i18n="description">Descrizione</span><input id="editDueDescription" required maxlength="120"></label>
+      <div class="fields">
+        <label><span data-i18n="expectedAmount">Importo previsto</span><input id="editDueAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required></label>
+        <label><span data-i18n="dueDate">Data di scadenza</span><input id="editDueDate" type="date" required></label>
+        <label><span data-i18n="category">Categoria</span><select id="editDueCategory"></select></label>
+        <label><span data-i18n="frequency">Ricorrenza</span>
+          <select id="editDueFrequency">
+            <option value="none" data-i18n="once">Una volta</option>
+            <option value="monthly" data-i18n="monthly">Mensile</option>
+            <option value="yearly" data-i18n="yearly">Annuale</option>
+          </select>
+        </label>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button type="button" onclick="closeModal('editDueModal')" data-i18n="cancel">Annulla</button>
+        <button class="primary" type="button" onclick="saveEditedDue()" data-i18n="save">Salva Modifiche</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="editGoalModal" class="modal-backdrop" style="display:none">
+  <div class="modal-box" style="text-align:left;">
+    <h3 style="color:var(--accent); margin-bottom:16px;" data-i18n="editGoalTitle">Modifica Obiettivo</h3>
+    <form id="editGoalForm" onkeydown="preventEnterSubmit(event)">
+      <input type="hidden" id="editGoalId">
+      <label><span data-i18n="goalName">Nome obiettivo</span><input id="editGoalName" required></label>
+      <div class="fields">
+        <label><span data-i18n="targetAmount">Importo Target</span><input id="editGoalTarget" type="number" min="1" step="0.01" placeholder="0.00" required></label>
+        <label><span data-i18n="savedAmount">Importo Accantonato</span><input id="editGoalCurrent" type="number" min="0" step="0.01" placeholder="0.00"></label>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button type="button" onclick="closeModal('editGoalModal')" data-i18n="cancel">Annulla</button>
+        <button class="primary" type="button" onclick="saveEditedGoal()" data-i18n="save">Salva Modifiche</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="app">
+<header>
+  <div class="brand-container">
+    <div class="brand-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+        <defs>
+          <linearGradient id="noteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C084FC" /><stop offset="50%" stop-color="#7DD3FC" /><stop offset="100%" stop-color="#F472B6" />
+          </linearGradient>
+          <linearGradient id="pochetteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7E22CE" /><stop offset="100%" stop-color="#581C87" />
+          </linearGradient>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FDE047" /><stop offset="100%" stop-color="#CA8A04" />
+          </linearGradient>
+        </defs>
+        <g id="logo-content">
+          <polygon points="45,30 47.5,36 54,36.5 49,41 50.5,47.5 45,44 39.5,47.5 41,41 36,36.5 42.5,36" fill="url(#goldGrad)" />
+          <polygon points="100,18 103.5,26 112,27 105.5,33 107.5,41.5 100,37 92.5,41.5 94.5,33 88,27 96.5,26" fill="url(#goldGrad)" />
+          <polygon points="155,32 157.5,38 164,38.5 159,43 160.5,49.5 155,46 149.5,49.5 151,43 146,38.5 152.5,38" fill="url(#goldGrad)" />
+
+          <g id="banknote" transform="rotate(-12 100 85)">
+            <rect x="65" y="55" width="70" height="38" rx="4" fill="url(#noteGrad)" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="100" cy="74" r="7" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.8" />
+            <path d="M 72 63 L 78 63 M 122 85 L 128 85" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+          </g>
+
+          <g id="pochette">
+            <rect x="40" y="85" width="120" height="75" rx="20" fill="url(#pochetteGrad)" />
+            <path d="M 40 95 Q 100 135 160 95 L 160 85 Q 100 120 40 85 Z" fill="#6B21A8" opacity="0.5" />
+            <path d="M 40 85 Q 100 125 160 85 L 160 92 Q 100 132 40 92 Z" fill="url(#pochetteGrad)" />
+            <circle cx="100" cy="108" r="5.5" fill="url(#goldGrad)" />
+            <circle cx="100" cy="108" r="2.5" fill="#581C87" opacity="0.3" />
+            <rect x="44" y="89" width="112" height="67" rx="16" fill="none" stroke="#A855F7" stroke-width="1" stroke-dasharray="3,3" opacity="0.4" />
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <div class="brand">Pochette.</div>
+      <div class="subtitle" data-i18n="tagline">Il tuo denaro, in perfetta armonia.</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button onclick="exportPDF()" data-i18n="pdfReport">Report PDF</button>
+    <button class="danger" onclick="resetApp()" data-i18n="restore">Ripristina</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" data-page="dashboard" data-i18n="navDashboard">Panoramica</button>
+  <button data-page="accounts" data-i18n="navAccounts">Conti</button>
+  <button data-page="movements" data-i18n="navMovements">Movimenti</button>
+  <button data-page="deadlines" data-i18n="navDeadlines">Scadenze</button>
+  <button data-page="budget" data-i18n="navBudget">Budget e Limiti</button>
+  <button data-page="goals" data-i18n="navGoals">Obiettivi</button>
+  <button data-page="analytics" data-i18n="navAnalytics">Analisi</button>
+  <button data-page="settings" data-i18n="navSettings">Impostazioni</button>
+
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ThemeManager.toggle()">
+    <span id="themeIcon">🌙</span> <span id="themeLabel">Scuro</span>
+  </button>
+</nav>
+
+<!-- PANORAMICA -->
+<section id="dashboard" class="page active">
+  <div class="section-head">
+    <div>
+      <h2 data-i18n="yourSituation">La tua situazione</h2>
+      <div class="muted" id="asOf"></div>
+    </div>
+    <button class="primary" onclick="showPage('movements')" data-i18n="newTx">+ Nuovo movimento</button>
+  </div>
+  <div class="grid">
+    <div class="metric"><div class="label" data-i18n="totalBalance">Saldo totale attuale</div><div class="value positive" id="currentBalance">—</div><div class="muted" data-i18n="sumAccounts">Somma dei tuoi conti</div></div>
+    <div class="metric"><div class="label" data-i18n="forecastBalance">Saldo previsto</div><div class="value positive" id="forecastBalance">—</div><div class="muted" data-i18n="endPeriod">A fine periodo</div></div>
+    <div class="metric"><div class="label" data-i18n="minBalance">Saldo minimo previsto</div><div class="value" id="minBalance">—</div><div class="muted" id="minDate"></div></div>
+    <div class="metric"><div class="label" data-i18n="unpaidDues">Scadenze non pagate</div><div class="value negative" id="dueTotal">—</div><div class="muted" id="dueCount"></div></div>
+  </div>
+
+  <div class="panel" style="margin-top:18px">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <h3 data-i18n="monthHistory">Storico Saldi e Confronto Mese</h3>
+      <label style="margin:0; width:auto;"><span data-i18n="selectMonth">Seleziona mese</span>: 
+        <select id="overviewMonthFilter" onchange="renderDashboardMonthHistory()"></select>
+      </label>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="metric"><div class="label" data-i18n="startBalance">Saldo Iniziale Mese</div><div class="value" id="dashStartBalance">—</div></div>
+      <div class="metric"><div class="label" data-i18n="monthIncome">Entrate del Mese</div><div class="value positive" id="dashMonthIncome">—</div></div>
+      <div class="metric"><div class="label" data-i18n="monthExpense">Uscite del Mese</div><div class="value negative" id="dashMonthExpense">—</div></div>
+      <div class="metric"><div class="label" data-i18n="endBalance">Saldo Finale Mese</div><div class="value" id="dashEndBalance">—</div></div>
+    </div>
+  </div>
+
+  <div class="two" style="margin-top:18px">
+    <div class="panel"><h3 data-i18n="upcomingDues">Prossime scadenze</h3><div id="upcoming"></div></div>
+    <div class="panel"><h3 data-i18n="variableExpenses">Spese variabili previste (Budget)</h3><div id="quickBudget"></div></div>
+  </div>
+</section>
+
+<!-- CONTI -->
+<section id="accounts" class="page">
+  <h2 data-i18n="accountsTitle">Gestione Conti e Portafogli</h2>
+  <div class="two">
+    <div class="panel">
+      <h3 data-i18n="addAccount">Aggiungi un nuovo conto</h3>
+      <form id="accountForm" onkeydown="preventEnterSubmit(event)">
+        <label><span data-i18n="accountName">Nome conto</span><input id="accName" data-i18n-ph="accNamePlaceholder" placeholder="Conto Corrente, Carta" required></label>
+        <label><span data-i18n="initialBalance">Saldo Iniziale</span><input id="accBalance" type="number" step="0.01" placeholder="0.00" required></label>
+        <button class="primary" type="button" onclick="submitAccountForm()" data-i18n="createAccount">Crea conto</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="yourAccounts">I tuoi conti</h3>
+      <div id="accountsList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MOVIMENTI -->
+<section id="movements" class="page">
+  <h2 data-i18n="movementsTitle">Movimenti</h2>
+  <div class="panel">
+    <h3 data-i18n="recordMovement">Registra un movimento</h3>
+    <form id="transactionForm" onkeydown="preventEnterSubmit(event)">
+      <div class="fields">
+        <label><span data-i18n="type">Tipo</span>
+          <select id="txType">
+            <option value="expense" data-i18n="expense">Uscita</option>
+            <option value="income" data-i18n="income">Entrata</option>
+          </select>
+        </label>
+        <label><span data-i18n="account">Conto</span><select id="txAccount"></select></label>
+        <label><span data-i18n="amount">Importo</span><input id="txAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required></label>
+        <label><span data-i18n="date">Data</span><input id="txDate" type="date" required></label>
+        <label><span data-i18n="category">Categoria</span><select id="txCategory"></select></label>
+        <label><span data-i18n="tag">Tag</span><input id="txTag" list="tagSuggestions" placeholder="#shopping"></label>
+      </div>
+      <label><span data-i18n="description">Descrizione</span><input id="txDescription" list="descSuggestions" maxlength="120" data-i18n-ph="txDescPlaceholder" placeholder="Spesa supermercato"></label>
+      <button class="primary" type="button" onclick="submitTransactionForm()" data-i18n="recordButton">Registra movimento</button>
+    </form>
+  </div>
+
+  <div class="section-head">
+    <h3 data-i18n="movementHistory">Storico Movimenti</h3>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+      <label style="min-width:180px;"><span data-i18n="search">Cerca tra i movimenti</span>
+        <input type="text" id="txSearchInput" data-i18n-ph="searchPlaceholder" placeholder="🔍 Descrizione o tag..." oninput="renderTransactions()">
+      </label>
+      <label><span data-i18n="filterAccount">Filtra conto</span><select id="accountFilter" onchange="renderTransactions()"></select></label>
+      <label><span data-i18n="filterMonth">Filtra mese</span><select id="monthFilter" onchange="renderTransactions()"></select></label>
+    </div>
+  </div>
+  <div class="panel scroll" id="transactionList"></div>
+</section>
+
+<!-- SCADENZE -->
+<section id="deadlines" class="page">
+  <h2 data-i18n="deadlinesTitle">Scadenze e pagamenti</h2>
+  <div class="two">
+    <div class="panel">
+      <h3 data-i18n="addDeadline">Aggiungi una scadenza</h3>
+      <form id="dueForm" onkeydown="preventEnterSubmit(event)">
+        <label><span data-i18n="description">Descrizione</span><input id="dueDescription" required maxlength="120" data-i18n-ph="dueDescPlaceholder" placeholder="Abbonamento palestra"></label>
+        <div class="fields">
+          <label><span data-i18n="expectedAmount">Importo previsto</span><input id="dueAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required></label>
+          <label><span data-i18n="dueDate">Data di scadenza</span><input id="dueDate" type="date" required></label>
+          <label><span data-i18n="category">Categoria</span><select id="dueCategory"></select></label>
+          <label><span data-i18n="frequency">Ricorrenza</span>
+            <select id="dueFrequency">
+              <option value="none" data-i18n="once">Una volta</option>
+              <option value="monthly" data-i18n="monthly">Mensile</option>
+              <option value="yearly" data-i18n="yearly">Annuale</option>
+            </select>
+          </label>
+        </div>
+        <button class="primary" type="button" onclick="submitDueForm()" data-i18n="addDeadlineBtn">Aggiungi scadenza</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="deadlinesList">Elenco scadenze</h3>
+      <div id="dueList" class="scroll"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BUDGET E LIMITI -->
+<section id="budget" class="page">
+  <h2 data-i18n="budgetTitle">Budget e Limiti di Spesa</h2>
+  <div class="notice" data-i18n="budgetNotice">Imposta dei limiti massimi di spesa mensili per categoria per gestire al meglio le tue finanze.</div>
+  <div class="panel">
+    <h3 data-i18n="categoryLimits">Limiti per Categoria</h3>
+    <div id="budgetCategoryList"></div>
+  </div>
+</section>
+
+<!-- OBIETTIVI -->
+<section id="goals" class="page">
+  <h2 data-i18n="goalsTitle">Obiettivi di Risparmio</h2>
+  <div class="two">
+    <div class="panel">
+      <h3 data-i18n="newGoal">Crea nuovo obiettivo</h3>
+      <form id="goalForm" onkeydown="preventEnterSubmit(event)">
+        <label><span data-i18n="goalName">Nome obiettivo</span><input id="goalName" data-i18n-ph="goalNamePlaceholder" placeholder="Fondo Emergenza" required></label>
+        <div class="fields">
+          <label><span data-i18n="targetAmount">Importo Target</span><input id="goalTarget" type="number" min="1" step="0.01" placeholder="0.00" required></label>
+          <label><span data-i18n="savedAmount">Importo Accantonato</span><input id="goalCurrent" type="number" min="0" step="0.01" placeholder="0.00"></label>
+        </div>
+        <button class="primary" type="button" onclick="submitGoalForm()" data-i18n="saveGoal">Salva Obiettivo</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="yourGoals">I tuoi obiettivi</h3>
+      <div id="goalsList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ANALISI -->
+<section id="analytics" class="page">
+  <h2 data-i18n="analyticsTitle">Analisi delle spese</h2>
+  <div class="panel">
+    <label style="max-width:280px"><span data-i18n="selectAnalyzeMonth">Seleziona mese da analizzare</span>
+      <select id="analyticsMonth" onchange="renderAnalytics()"></select>
+    </label>
+    <div class="grid" style="margin-top:14px">
+      <div class="metric"><div class="label" data-i18n="actualIncome">Entrate effettive</div><div class="value positive" id="aIncome">—</div></div>
+      <div class="metric"><div class="label" data-i18n="actualExpense">Uscite effettive</div><div class="value negative" id="aExpense">—</div></div>
+      <div class="metric"><div class="label" data-i18n="difference">Differenza</div><div class="value" id="aDifference">—</div></div>
+      <div class="metric"><div class="label" data-i18n="movementsCount">Movimenti</div><div class="value" id="aCount">—</div></div>
+    </div>
+  </div>
+
+  <div class="charts-grid" style="margin-top:16px">
+    <div class="panel">
+      <h3 data-i18n="chartTotalTitle">1. Totale Entrate vs Uscite</h3>
+      <div class="muted" style="margin-bottom:12px; font-size:12px;" data-i18n="chartTotalSub">Valutazione globale del mese.</div>
+      <div id="totalChartContainer" class="chart-container"></div>
+    </div>
+
+    <div class="panel">
+      <h3 data-i18n="chartCategoryTitle">2. Spese Ripartite per Categoria</h3>
+      <div class="muted" style="margin-bottom:12px; font-size:12px;" data-i18n="chartCategorySub">Dettaglio esclusivo delle uscite.</div>
+      <div id="categoryChartContainer" class="chart-container"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h3 data-i18n="categorySummary">Riepilogo categorie di spesa</h3>
+    <div id="categoryAnalytics"></div>
+  </div>
+</section>
+
+<!-- IMPOSTAZIONI -->
+<section id="settings" class="page">
+  <h2 data-i18n="settingsTitle">Impostazioni e Sicurezza</h2>
+  <div class="panel">
+    <h3 data-i18n="preferences">Lingua, Valuta e Previsioni</h3>
+    <form id="settingsForm" onkeydown="preventEnterSubmit(event)">
+      
+      <label><span data-i18n="languageCurrency">Lingua & Valuta App</span>
+        <select id="langSetting" onchange="I18n.setLanguage(this.value)">
+          <option value="it-IT">Italiano (€ - EUR)</option>
+          <option value="en-GB">English UK (£ - GBP)</option>
+          <option value="en-US">English US ($ - USD)</option>
+        </select>
+      </label>
+
+      <label><span data-i18n="horizon">Orizzonte di previsione (giorni)</span><input id="horizon" type="number" min="7" max="365" required></label>
+      <label><span data-i18n="reserve">Riserva minima desiderata</span><input id="reserve" type="number" min="0" step="0.01" placeholder="0.00" required></label>
+      <label><span data-i18n="pinProtection">Protezione PIN (opzionale)</span>
+        <input id="pinSetting" type="password" maxlength="8" placeholder="Codice PIN">
+      </label>
+
+      <div style="margin-top: 10px;">
+        <label style="margin-bottom:6px; color:var(--text); font-weight:600;" data-i18n="privacyHeading">Informativa sulla Privacy e Trattamento Dati</label>
+        <div class="privacy-box" data-i18n="privacyText">
+          Pochette tutela la tua riservatezza. Tutti i dati finanziari vengono memorizzati esclusivamente in locale sul tuo browser. Nessun dato viene inviato a server esterni.
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; margin-top:10px; cursor:pointer; color:var(--text); font-size:13px;">
+          <input type="checkbox" id="privacyConsent" style="width:auto; cursor:pointer;" required>
+          <span data-i18n="privacyAccept">Ho letto e accetto l'informativa sulla privacy e l'archiviazione locale dei dati</span>
+        </label>
+      </div>
+
+      <button class="primary" type="button" onclick="submitSettingsForm()" style="margin-top:10px;" data-i18n="saveSettings">Salva impostazioni</button>
+    </form>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h3 data-i18n="dataManagement">Gestione dati</h3>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="danger" onclick="resetApp()" data-i18n="restore">Ripristina</button>
+      <button class="danger" onclick="resetDemo()" data-i18n="resetData">Azzera tutti i dati</button>
+    </div>
+  </div>
+</section>
+
+<footer data-i18n="footerText">Pochette · Nessun collegamento bancario esterno · Dati memorizzati nel browser.</footer>
+</div>
+
+<script>
+"use strict";
+
+const MASTER_KEY = "MASTER2026";
+let GOOGLE_SCRIPT_URL = localStorage.getItem("pochette_script_url") || "";
+
+const TRANSLATIONS = {
+  "it-IT": {
+    currency: "EUR", locale: "it-IT",
+    tagline: "Il tuo denaro, in perfetta armonia.",
+    pdfReport: "Report PDF", restore: "Ripristina",
+    navDashboard: "Panoramica", navAccounts: "Conti", navMovements: "Movimenti", navDeadlines: "Scadenze",
+    navBudget: "Budget e Limiti", navGoals: "Obiettivi", navAnalytics: "Analisi", navSettings: "Impostazioni",
+    yourSituation: "La tua situazione", asOfToday: "Saldo aggiornato ad oggi", newTx: "+ Nuovo movimento",
+    totalBalance: "Saldo totale attuale", sumAccounts: "Somma dei tuoi conti", forecastBalance: "Saldo previsto",
+    endPeriod: "A fine periodo", minBalance: "Saldo minimo previsto", unpaidDues: "Scadenze non pagate",
+    monthHistory: "Storico Saldi e Confronto Mese", selectMonth: "Seleziona mese", startBalance: "Saldo Iniziale Mese",
+    monthIncome: "Entrate del Mese", monthExpense: "Uscite del Mese", endBalance: "Saldo Finale Mese",
+    upcomingDues: "Prossime scadenze", variableExpenses: "Spese variabili previste (Budget)",
+    accountsTitle: "Gestione Conti e Portafogli", addAccount: "Aggiungi un nuovo conto", accountName: "Nome conto",
+    initialBalance: "Saldo Iniziale", createAccount: "Crea conto", yourAccounts: "I tuoi conti",
+    movementsTitle: "Movimenti", recordMovement: "Registra un movimento", type: "Tipo", expense: "Uscita",
+    income: "Entrata", account: "Conto", amount: "Importo", date: "Data", category: "Categoria", tag: "Tag",
+    description: "Descrizione", recordButton: "Registra movimento", movementHistory: "Storico Movimenti",
+    search: "Cerca tra i movimenti", filterAccount: "Tutti i conti", filterMonth: "Filtra mese",
+    deadlinesTitle: "Scadenze e pagamenti", addDeadline: "Aggiungi una scadenza", expectedAmount: "Importo previsto",
+    dueDate: "Data di scadenza", frequency: "Ricorrenza", once: "Una volta", monthly: "Mensile", yearly: "Annuale",
+    addDeadlineBtn: "Aggiungi scadenza", deadlinesList: "Elenco scadenze", pay: "Paga", edit: "Modifica", delete: "Elimina",
+    budgetTitle: "Budget e Limiti di Spesa", budgetNotice: "Imposta dei limiti massimi di spesa mensili per categoria per gestire al meglio le tue finanze.",
+    categoryLimits: "Limiti per Categoria", setLimit: "Imposta Limite", spentInMonth: "Speso nel mese", limit: "Limite",
+    goalsTitle: "Obiettivi di Risparmio", newGoal: "Crea nuovo obiettivo", goalName: "Nome obiettivo",
+    targetAmount: "Importo Target", savedAmount: "Importo Accantonato", saveGoal: "Salva Obiettivo", yourGoals: "I tuoi obiettivi",
+    analyticsTitle: "Analisi delle spese", selectAnalyzeMonth: "Seleziona mese da analizzare", actualIncome: "Entrate effettive",
+    actualExpense: "Uscite effettive", difference: "Differenza", movementsCount: "Movimenti",
+    chartTotalTitle: "1. Totale Entrate vs Uscite", chartTotalSub: "Valutazione globale del mese.",
+    chartCategoryTitle: "2. Spese Ripartite per Categoria", chartCategorySub: "Dettaglio esclusivo delle uscite.",
+    categorySummary: "Riepilogo categorie di spesa", settingsTitle: "Impostazioni e Sicurezza",
+    preferences: "Lingua, Valuta e Previsioni", languageCurrency: "Lingua & Valuta App", horizon: "Orizzonte di previsione (giorni)",
+    reserve: "Riserva minima desiderata", pinProtection: "Protezione PIN (opzionale)", privacyHeading: "Informativa sulla Privacy e Trattamento Dati",
+    privacyText: "Pochette tutela la tua riservatezza. Tutti i dati finanziari vengono memorizzati esclusivamente in locale sul tuo browser. Nessun dato viene inviato a server esterni.",
+    privacyAccept: "Ho letto e accetto l'informativa sulla privacy e l'archiviazione locale dei dati",
+    saveSettings: "Salva impostazioni", dataManagement: "Gestione dati", resetData: "Azzera tutti i dati", footerText: "Pochette · Nessun collegamento bancario esterno · Dati memorizzati nel browser.",
+    lockPrompt: "Inserisci il PIN di protezione per accedere", unlock: "Sblocca", editTxTitle: "Modifica Movimento",
+    editDueTitle: "Modifica Scadenza", editGoalTitle: "Modifica Obiettivo", cancel: "Annulla", save: "Salva Modifiche",
+    privacyModalTitle: "Benvenuta! Informativa sulla Privacy", continueApp: "Accetta e Continua",
+    actionsCol: "Azioni", noMovements: "Nessun movimento trovato.", noUpcomingDues: "Nessuna scadenza imminente.",
+    noAccounts: "Nessun conto presente.", noGoals: "Nessun obiettivo impostato.", noDataMonth: "Nessun dato per questo mese.",
+    noBudgetLimits: "Nessun limite di budget impostato. Impostalo nella sezione 'Budget e Limiti'.",
+    remainingLabel: "Rimangono",
+    accNamePlaceholder: "Es. Conto Corrente, Carta", txDescPlaceholder: "Es. Spesa supermercato",
+    searchPlaceholder: "🔍 Descrizione o tag...", dueDescPlaceholder: "Es. Abbonamento palestra",
+    goalNamePlaceholder: "Es. Fondo Emergenza",
+    categories: {
+      expense: ["Casa","Bollette","Alimentari","Benzina e trasporti","Salute","Tempo libero","Abbonamenti","Assicurazioni","Shopping","Altro"],
+      income: ["Stipendio","Lavoro extra","Rimborsi","Altre entrate"]
+    }
+  },
+  "en-GB": {
+    currency: "GBP", locale: "en-GB",
+    tagline: "Your money, in perfect harmony.",
+    pdfReport: "PDF Report", restore: "Reset",
+    navDashboard: "Dashboard", navAccounts: "Accounts", navMovements: "Transactions", navDeadlines: "Bills",
+    navBudget: "Budgets", navGoals: "Goals", navAnalytics: "Analytics", navSettings: "Settings",
+    yourSituation: "Your Overview", asOfToday: "Balance updated as of today", newTx: "+ New transaction",
+    totalBalance: "Current Total Balance", sumAccounts: "Sum of your accounts", forecastBalance: "Forecast Balance",
+    endPeriod: "At end of period", minBalance: "Min Forecast Balance", unpaidDues: "Unpaid Bills",
+    monthHistory: "Balance History & Month Comparison", selectMonth: "Select month", startBalance: "Starting Balance",
+    monthIncome: "Month Income", monthExpense: "Month Expenses", endBalance: "Ending Balance",
+    upcomingDues: "Upcoming Bills", variableExpenses: "Variable Expenses (Monthly Budget)",
+    accountsTitle: "Accounts & Wallets", addAccount: "Add New Account", accountName: "Account Name",
+    initialBalance: "Initial Balance", createAccount: "Create Account", yourAccounts: "Your Accounts",
+    movementsTitle: "Transactions", recordMovement: "Record Transaction", type: "Type", expense: "Expense",
+    income: "Income", account: "Account", amount: "Amount", date: "Date", category: "Category", tag: "Tag",
+    description: "Description", recordButton: "Record Transaction", movementHistory: "Transaction History",
+    search: "Search transactions", filterAccount: "All Accounts", filterMonth: "Filter month",
+    deadlinesTitle: "Bills & Scheduled Payments", addDeadline: "Add New Bill", expectedAmount: "Expected Amount",
+    dueDate: "Due Date", frequency: "Frequency", once: "One-off", monthly: "Monthly", yearly: "Yearly",
+    addDeadlineBtn: "Add Bill", deadlinesList: "Bills List", pay: "Pay", edit: "Edit", delete: "Delete",
+    budgetTitle: "Budgets & Spending Limits", budgetNotice: "Set monthly spending caps per category to keep your finances on track.",
+    categoryLimits: "Category Limits", setLimit: "Set Limit", spentInMonth: "Spent this month", limit: "Limit",
+    goalsTitle: "Savings Goals", newGoal: "Create New Goal", goalName: "Goal Name",
+    targetAmount: "Target Amount", savedAmount: "Saved Amount", saveGoal: "Save Goal", yourGoals: "Your Goals",
+    analyticsTitle: "Expense Analytics", selectAnalyzeMonth: "Select month to analyze", actualIncome: "Total Income",
+    actualExpense: "Total Expenses", difference: "Net Income", movementsCount: "Transactions Count",
+    chartTotalTitle: "1. Total Income vs Expenses", chartTotalSub: "Overall monthly summary.",
+    chartCategoryTitle: "2. Expenses by Category", chartCategorySub: "Breakdown of outgoing funds.",
+    categorySummary: "Category Expense Summary", settingsTitle: "Settings & Security",
+    preferences: "Language, Currency & Forecasts", languageCurrency: "App Language & Currency", horizon: "Forecast Horizon (days)",
+    reserve: "Minimum Desired Reserve", pinProtection: "PIN Protection (optional)", privacyHeading: "Privacy Policy & Data Handling",
+    privacyText: "Pochette values your privacy. All financial data is stored locally in your browser. No data is ever sent to external servers.",
+    privacyAccept: "I have read and accept the privacy policy and local storage terms",
+    saveSettings: "Save Settings", dataManagement: "Data Management", resetData: "Reset All Data", footerText: "Pochette · No external bank connections · 100% Local browser storage.",
+    lockPrompt: "Enter PIN to unlock", unlock: "Unlock", editTxTitle: "Edit Transaction",
+    editDueTitle: "Edit Bill", editGoalTitle: "Edit Goal", cancel: "Cancel", save: "Save Changes",
+    privacyModalTitle: "Welcome! Privacy Notice", continueApp: "Accept and Continue",
+    actionsCol: "Actions", noMovements: "No transactions found.", noUpcomingDues: "No upcoming bills.",
+    noAccounts: "No accounts created yet.", noGoals: "No goals set yet.", noDataMonth: "No data for this month.",
+    noBudgetLimits: "No budget limits set yet. Set them in 'Budgets' section.",
+    remainingLabel: "Remaining",
+    accNamePlaceholder: "e.g. Checking Account, Card", txDescPlaceholder: "e.g. Grocery store",
+    searchPlaceholder: "🔍 Description or tag...", dueDescPlaceholder: "e.g. Gym membership",
+    goalNamePlaceholder: "e.g. Emergency Fund",
+    categories: {
+      expense: ["Housing","Utilities","Groceries","Transport","Health","Leisure","Subscriptions","Insurance","Shopping","Other"],
+      income: ["Salary","Freelance","Refunds","Other Income"]
+    }
+  },
+  "en-US": {
+    currency: "USD", locale: "en-US",
+    tagline: "Your money, in perfect harmony.",
+    pdfReport: "PDF Report", restore: "Reset",
+    navDashboard: "Dashboard", navAccounts: "Accounts", navMovements: "Transactions", navDeadlines: "Bills",
+    navBudget: "Budgets", navGoals: "Goals", navAnalytics: "Analytics", navSettings: "Settings",
+    yourSituation: "Your Overview", asOfToday: "Balance updated as of today", newTx: "+ New transaction",
+    totalBalance: "Current Total Balance", sumAccounts: "Sum of your accounts", forecastBalance: "Forecast Balance",
+    endPeriod: "At end of period", minBalance: "Min Forecast Balance", unpaidDues: "Unpaid Bills",
+    monthHistory: "Balance History & Month Comparison", selectMonth: "Select month", startBalance: "Starting Balance",
+    monthIncome: "Month Income", monthExpense: "Month Expenses", endBalance: "Ending Balance",
+    upcomingDues: "Upcoming Bills", variableExpenses: "Variable Expenses (Monthly Budget)",
+    accountsTitle: "Accounts & Wallets", addAccount: "Add New Account", accountName: "Account Name",
+    initialBalance: "Initial Balance", createAccount: "Create Account", yourAccounts: "Your Accounts",
+    movementsTitle: "Transactions", recordMovement: "Record Transaction", type: "Type", expense: "Expense",
+    income: "Income", account: "Account", amount: "Amount", date: "Date", category: "Category", tag: "Tag",
+    description: "Description", recordButton: "Record Transaction", movementHistory: "Transaction History",
+    search: "Search transactions", filterAccount: "All Accounts", filterMonth: "Filter month",
+    deadlinesTitle: "Bills & Scheduled Payments", addDeadline: "Add New Bill", expectedAmount: "Expected Amount",
+    dueDate: "Due Date", frequency: "Frequency", once: "One-off", monthly: "Monthly", yearly: "Yearly",
+    addDeadlineBtn: "Add Bill", deadlinesList: "Bills List", pay: "Pay", edit: "Edit", delete: "Delete",
+    budgetTitle: "Budgets & Spending Limits", budgetNotice: "Set monthly spending caps per category to keep your finances on track.",
+    categoryLimits: "Category Limits", setLimit: "Set Limit", spentInMonth: "Spent this month", limit: "Limit",
+    goalsTitle: "Savings Goals", newGoal: "Create New Goal", goalName: "Goal Name",
+    targetAmount: "Target Amount", savedAmount: "Saved Amount", saveGoal: "Save Goal", yourGoals: "Your Goals",
+    analyticsTitle: "Expense Analytics", selectAnalyzeMonth: "Select month to analyze", actualIncome: "Total Income",
+    actualExpense: "Total Expenses", difference: "Net Income", movementsCount: "Transactions Count",
+    chartTotalTitle: "1. Total Income vs Expenses", chartTotalSub: "Overall monthly summary.",
+    chartCategoryTitle: "2. Expenses by Category", chartCategorySub: "Breakdown of outgoing funds.",
+    categorySummary: "Category Expense Summary", settingsTitle: "Settings & Security",
+    preferences: "Language, Currency & Forecasts", languageCurrency: "App Language & Currency", horizon: "Forecast Horizon (days)",
+    reserve: "Minimum Desired Reserve", pinProtection: "PIN Protection (optional)", privacyHeading: "Privacy Policy & Data Handling",
+    privacyText: "Pochette values your privacy. All financial data is stored locally in your browser. No data is ever sent to external servers.",
+    privacyAccept: "I have read and accept the privacy policy and local storage terms",
+    saveSettings: "Save Settings", dataManagement: "Data Management", resetData: "Reset All Data", footerText: "Pochette · No external bank connections · 100% Local browser storage.",
+    lockPrompt: "Enter PIN to unlock", unlock: "Unlock", editTxTitle: "Edit Transaction",
+    editDueTitle: "Edit Bill", editGoalTitle: "Edit Goal", cancel: "Cancel", save: "Save Changes",
+    privacyModalTitle: "Welcome! Privacy Notice", continueApp: "Accept and Continue",
+    actionsCol: "Actions", noMovements: "No transactions found.", noUpcomingDues: "No upcoming bills.",
+    noAccounts: "No accounts created yet.", noGoals: "No goals set yet.", noDataMonth: "No data for this month.",
+    noBudgetLimits: "No budget limits set yet. Set them in 'Budgets' section.",
+    remainingLabel: "Remaining",
+    accNamePlaceholder: "e.g. Checking Account, Card", txDescPlaceholder: "e.g. Grocery store",
+    searchPlaceholder: "🔍 Description or tag...", dueDescPlaceholder: "e.g. Gym membership",
+    goalNamePlaceholder: "e.g. Emergency Fund",
+    categories: {
+      expense: ["Housing","Utilities","Groceries","Transport","Health","Leisure","Subscriptions","Insurance","Shopping","Other"],
+      income: ["Salary","Freelance","Refunds","Other Income"]
+    }
+  }
+};
+
+const I18n = {
+  lang: "it-IT",
+  t(key) {
+    return TRANSLATIONS[this.lang]?.[key] || TRANSLATIONS["it-IT"]?.[key] || key;
+  },
+  getCategories() {
+    return TRANSLATIONS[this.lang]?.categories || TRANSLATIONS["it-IT"].categories;
+  },
+  setLanguage(newLang) {
+    if (TRANSLATIONS[newLang]) {
+      this.lang = newLang;
+      state.lang = newLang;
+      document.documentElement.lang = newLang.slice(0, 2);
+      this.updateDOM();
+      save();
+    }
+  },
+  updateDOM() {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (this.t(key)) el.textContent = this.t(key);
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+      const key = el.getAttribute("data-i18n-ph");
+      if (this.t(key)) el.placeholder = this.t(key);
+    });
+  }
+};
+
+const ThemeManager = {
+  init() {
+    const savedTheme = localStorage.getItem("pochette-theme");
+    if (savedTheme) {
+      this.set(savedTheme);
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      this.set(prefersDark ? "dark" : "light");
+    }
+  },
+  set(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("pochette-theme", theme);
+    const icon = document.getElementById("themeIcon");
+    const label = document.getElementById("themeLabel");
+    if (icon && label) {
+      icon.textContent = theme === "dark" ? "☀️" : "🌙";
+      label.textContent = theme === "dark" ? (I18n.lang === "it-IT" ? "Chiaro" : "Light") : (I18n.lang === "it-IT" ? "Scuro" : "Dark");
+    }
+  },
+  toggle() {
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    this.set(current === "light" ? "dark" : "light");
+  }
+};
+
+function emptyState() {
+  return {
+    version: 21,
+    lang: "it-IT",
+    pin: "",
+    privacyAccepted: false,
+    horizon: 30,
+    reserveCents: 0,
+    accounts: [],
+    transactions: [],
+    dues: [],
+    categoryLimits: {},
+    goals: []
+  };
+}
+
+let state;
+try {
+  state = JSON.parse(localStorage.getItem("pochette-app-v21")) || emptyState();
+} catch { state = emptyState(); }
+
+I18n.lang = state.lang || "it-IT";
+
+function save() {
+  localStorage.setItem("pochette-app-v21", JSON.stringify(state));
+  render();
+}
+
+const euroToCents = value => Math.round(Number(value) * 100);
+const money = cents => {
+  const cfg = TRANSLATIONS[I18n.lang] || TRANSLATIONS["it-IT"];
+  return new Intl.NumberFormat(cfg.locale, { style: "currency", currency: cfg.currency }).format(cents / 100);
+};
+const todayISO = () => new Date().toISOString().slice(0,10);
+const addDays = (iso, n) => {
+  const d = new Date(iso+"T12:00:00");
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+};
+const dateLabel = iso => iso ? new Date(iso+"T12:00:00").toLocaleDateString(TRANSLATIONS[I18n.lang].locale) : "—";
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2);
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+const monthKey = iso => iso.slice(0,7);
+
+function formatMonthYearLabel(key) {
+  if (!key) return "";
+  const [year, month] = key.split("-");
+  const monthIdx = parseInt(month, 10) - 1;
+  const d = new Date(year, monthIdx, 1);
+  return d.toLocaleDateString(TRANSLATIONS[I18n.lang].locale, { month: 'long', year: 'numeric' });
+}
+
+function checkLicense() {
+  const isActivated = localStorage.getItem("pochette_activated");
+  if (isActivated === "true") {
+    document.getElementById("licenseOverlay").style.display = "none";
+    checkInitialState();
+  } else {
+    document.getElementById("licenseOverlay").style.display = "flex";
+    if (GOOGLE_SCRIPT_URL) {
+      document.getElementById("scriptUrlInput").value = GOOGLE_SCRIPT_URL;
+    }
+  }
+}
+
+async function activateLicense() {
+  const input = document.getElementById("licenseKeyInput").value.trim().toUpperCase();
+  const customScriptUrl = document.getElementById("scriptUrlInput").value.trim();
+  const msgEl = document.getElementById("licenseMsg");
+  const btn = document.getElementById("activateBtn");
+
+  if (customScriptUrl) {
+    GOOGLE_SCRIPT_URL = customScriptUrl;
+    localStorage.setItem("pochette_script_url", customScriptUrl);
+  }
+
+  if (!input) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Inserisci un codice valido.";
+    return;
+  }
+
+  if (input === MASTER_KEY) {
+    localStorage.setItem("pochette_activated", "true");
+    document.getElementById("licenseOverlay").style.display = "none";
+    checkInitialState();
+    alert("Applicazione sbloccata con Chiave Master!");
+    return;
+  }
+
+  if (!GOOGLE_SCRIPT_URL) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Inserisci l'URL del tuo Google Script.";
+    return;
+  }
+
+  btn.disabled = true;
+  msgEl.style.color = "var(--muted)";
+  msgEl.textContent = "Verifica del codice in corso...";
+
+  try {
+    const res = await fetch(`${GOOGLE_SCRIPT_URL}?key=${encodeURIComponent(input)}`);
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("pochette_activated", "true");
+      document.getElementById("licenseOverlay").style.display = "none";
+      checkInitialState();
+      alert("Attivazione riuscita! Benvenuta in Pochette.");
+    } else {
+      msgEl.style.color = "var(--danger)";
+      msgEl.textContent = data.message || "Codice non valido o già utilizzato.";
+    }
+  } catch (err) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Errore di connessione. Riprova più tardi.";
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function checkInitialState() {
+  const privacyOverlay = document.getElementById("privacyOverlay");
+  const lockOverlay = document.getElementById("lockOverlay");
+
+  if (!state.privacyAccepted) {
+    privacyOverlay.style.display = "flex";
+  } else {
+    privacyOverlay.style.display = "none";
+    if (state.pin && state.pin.length > 0) {
+      lockOverlay.style.display = "flex";
+    }
+  }
+}
+
+function acceptInitialPrivacy() {
+  const check = document.getElementById("initialPrivacyCheck").checked;
+  if (!check) {
+    alert(I18n.lang === "it-IT" ? "Devi spuntare la casella per accettare l'Informativa Privacy." : "You must check the box to accept Privacy Policy.");
+    return;
+  }
+  state.privacyAccepted = true;
+  document.getElementById("privacyOverlay").style.display = "none";
+  save();
+
+  if (state.pin && state.pin.length > 0) {
+    document.getElementById("lockOverlay").style.display = "flex";
+  }
+}
+
+function unlockApp() {
+  const input = document.getElementById("pinInput").value;
+  if (input === state.pin) {
+    document.getElementById("lockOverlay").style.display = "none";
+  } else {
+    alert(I18n.lang === "it-IT" ? "PIN errato!" : "Incorrect PIN!");
+  }
+}
+
+function updateSuggestions() {
+  const descSet = new Set();
+  const tagSet = new Set();
+  state.transactions.forEach(t => {
+    if (t.description) descSet.add(t.description);
+    if (t.tag) tagSet.add(t.tag);
+  });
+  const descList = document.getElementById("descSuggestions");
+  const tagList = document.getElementById("tagSuggestions");
+  if (descList) descList.innerHTML = Array.from(descSet).map(d => `<option value="${escapeHTML(d)}">`).join("");
+  if (tagList) tagList.innerHTML = Array.from(tagSet).map(t => `<option value="${escapeHTML(t)}">`).join("");
+}
+
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
+  document.querySelectorAll("nav button[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === id));
+  render();
+}
+document.querySelectorAll("nav button[data-page]").forEach(b => b.addEventListener("click", () => showPage(b.dataset.page)));
+
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
+function preventEnterSubmit(event) { if (event.key === "Enter") { event.preventDefault(); return false; } }
+
+function refreshCategories() {
+  const cats = I18n.getCategories();
+  const type = document.getElementById("txType").value;
+  document.getElementById("txCategory").innerHTML = cats[type].map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+  document.getElementById("dueCategory").innerHTML = cats.expense.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+  document.getElementById("editDueCategory").innerHTML = cats.expense.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+}
+document.getElementById("txType").addEventListener("change", refreshCategories);
+
+function refreshEditCategories() {
+  const cats = I18n.getCategories();
+  const type = document.getElementById("editTxType").value;
+  document.getElementById("editTxCategory").innerHTML = cats[type].map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+}
+
+function populateMonthSelects() {
+  const selects = ["monthFilter", "analyticsMonth", "overviewMonthFilter"];
+  const nowKey = monthKey(todayISO());
+  const keysSet = new Set([nowKey]);
+  state.transactions.forEach(t => { if (t.date) keysSet.add(monthKey(t.date)); });
+
+  const [currY, currM] = nowKey.split("-").map(Number);
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(currY, currM - 1 - i, 1);
+    const yStr = d.getFullYear();
+    const mStr = String(d.getMonth() + 1).padStart(2, "0");
+    keysSet.add(`${yStr}-${mStr}`);
+  }
+
+  const sortedKeys = Array.from(keysSet).sort().reverse();
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const currentVal = el.value || nowKey;
+    el.innerHTML = sortedKeys.map(k => `<option value="${k}">${formatMonthYearLabel(k)}</option>`).join("");
+    el.value = sortedKeys.includes(currentVal) ? currentVal : nowKey;
+  });
+}
+
+function submitTransactionForm() {
+  const amountVal = document.getElementById("txAmount").value;
+  const amount = euroToCents(amountVal);
+  const accountId = document.getElementById("txAccount").value;
+  const date = document.getElementById("txDate").value;
+
+  if (!accountId) return alert(I18n.lang === "it-IT" ? "Crea prima un conto!" : "Please create an account first!");
+  if (!amountVal || !amount || amount <= 0 || !date) return alert(I18n.lang === "it-IT" ? "Dati non validi." : "Invalid data.");
+
+  state.transactions.push({
+    id: uid(), createdAt: Date.now(), accountId, date,
+    type: document.getElementById("txType").value, amount,
+    category: document.getElementById("txCategory").value,
+    tag: document.getElementById("txTag").value.trim(),
+    description: document.getElementById("txDescription").value.trim()
+  });
+
+  const acc = state.accounts.find(a => a.id === accountId);
+  if (acc) {
+    if (document.getElementById("txType").value === "income") acc.balanceCents += amount;
+    else acc.balanceCents -= amount;
+  }
+
+  document.getElementById("transactionForm").reset();
+  document.getElementById("txDate").value = todayISO();
+  refreshCategories();
+  save();
+}
+
+function deleteTransaction(id) {
+  const tx = state.transactions.find(t => t.id === id);
+  if (!tx) return;
+  if (confirm(I18n.lang === "it-IT" ? "Confermi l'eliminazione?" : "Confirm deletion?")) {
+    const acc = state.accounts.find(a => a.id === tx.accountId);
+    if (acc) {
+      if (tx.type === "income") acc.balanceCents -= tx.amount;
+      else acc.balanceCents += tx.amount;
+    }
+    state.transactions = state.transactions.filter(t => t.id !== id);
+    save();
+  }
+}
+
+function openEditTxModal(id) {
+  const tx = state.transactions.find(t => t.id === id);
+  if (!tx) return;
+
+  document.getElementById("editTxId").value = tx.id;
+  document.getElementById("editTxType").value = tx.type;
+  
+  const selectAcc = document.getElementById("editTxAccount");
+  selectAcc.innerHTML = state.accounts.map(a => `<option value="${a.id}">${escapeHTML(a.name)}</option>`).join("");
+  selectAcc.value = tx.accountId;
+
+  refreshEditCategories();
+  document.getElementById("editTxCategory").value = tx.category;
+  document.getElementById("editTxAmount").value = (tx.amount / 100).toFixed(2);
+  document.getElementById("editTxDate").value = tx.date;
+  document.getElementById("editTxTag").value = tx.tag || "";
+  document.getElementById("editTxDescription").value = tx.description || "";
+
+  document.getElementById("editTxModal").style.display = "flex";
+}
+
+function saveEditedTransaction() {
+  const id = document.getElementById("editTxId").value;
+  const tx = state.transactions.find(t => t.id === id);
+  if (!tx) return;
+
+  const newAmountVal = document.getElementById("editTxAmount").value;
+  const newAmount = euroToCents(newAmountVal);
+  const newAccountId = document.getElementById("editTxAccount").value;
+  const newType = document.getElementById("editTxType").value;
+  const newDate = document.getElementById("editTxDate").value;
+
+  if (!newAmountVal || newAmount <= 0 || !newDate) return alert(I18n.lang === "it-IT" ? "Dati non validi." : "Invalid data.");
+
+  const oldAcc = state.accounts.find(a => a.id === tx.accountId);
+  if (oldAcc) {
+    if (tx.type === "income") oldAcc.balanceCents -= tx.amount;
+    else oldAcc.balanceCents += tx.amount;
+  }
+
+  tx.type = newType;
+  tx.accountId = newAccountId;
+  tx.amount = newAmount;
+  tx.date = newDate;
+  tx.category = document.getElementById("editTxCategory").value;
+  tx.tag = document.getElementById("editTxTag").value.trim();
+  tx.description = document.getElementById("editTxDescription").value.trim();
+
+  const newAcc = state.accounts.find(a => a.id === newAccountId);
+  if (newAcc) {
+    if (tx.type === "income") newAcc.balanceCents += newAmount;
+    else newAcc.balanceCents -= newAmount;
+  }
+
+  closeModal("editTxModal");
+  save();
+}
+
+function renderTransactions() {
+  const month = document.getElementById("monthFilter").value;
+  const accountId = document.getElementById("accountFilter").value;
+  const query = (document.getElementById("txSearchInput")?.value || "").toLowerCase().trim();
+
+  const filtered = state.transactions.filter(t => {
+    const matchesMonth = !month || monthKey(t.date) === month;
+    const matchesAcc = !accountId || t.accountId === accountId;
+    const matchesQuery = !query || 
+      (t.description && t.description.toLowerCase().includes(query)) ||
+      (t.tag && t.tag.toLowerCase().includes(query)) ||
+      (t.category && t.category.toLowerCase().includes(query));
+
+    return matchesMonth && matchesAcc && matchesQuery;
+  }).sort((a,b) => {
+    if (a.date !== b.date) return b.date.localeCompare(a.date);
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+
+  document.getElementById("transactionList").innerHTML = filtered.length ? `
+    <table>
+      <thead><tr>
+        <th>${I18n.t("date")}</th>
+        <th>${I18n.t("description")}</th>
+        <th>${I18n.t("category")}</th>
+        <th>${I18n.t("tag")}</th>
+        <th>${I18n.t("amount")}</th>
+        <th>${I18n.t("actionsCol")}</th>
+      </tr></thead>
+      <tbody>
+        ${filtered.map(t => `
+          <tr>
+            <td>${dateLabel(t.date)}</td>
+            <td>${escapeHTML(t.description || (t.type === 'income' ? I18n.t("income") : I18n.t("expense")))}</td>
+            <td>${escapeHTML(t.category)}</td>
+            <td><span class="muted">${escapeHTML(t.tag)}</span></td>
+            <td class="${t.type === 'income' ? 'positive' : 'negative'}">
+              ${t.type === 'income' ? '+' : '-'}${money(t.amount)}
+            </td>
+            <td>
+              <button class="small" onclick="openEditTxModal('${t.id}')">${I18n.t("edit")}</button>
+              <button class="small danger" onclick="deleteTransaction('${t.id}')">${I18n.t("delete")}</button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  ` : `<div class="empty">${I18n.t("noMovements")}</div>`;
+}
+
+function submitDueForm() {
+  const desc = document.getElementById("dueDescription").value.trim();
+  const amountVal = document.getElementById("dueAmount").value;
+  const date = document.getElementById("dueDate").value;
+  if (!desc || !amountVal || !date) return alert(I18n.lang === "it-IT" ? "Compila tutti i campi." : "Fill in all fields.");
+
+  state.dues.push({
+    id: uid(), description: desc, amount: euroToCents(amountVal), date,
+    category: document.getElementById("dueCategory").value,
+    frequency: document.getElementById("dueFrequency").value, status: "planned"
+  });
+
+  document.getElementById("dueForm").reset();
+  document.getElementById("dueDate").value = addDays(todayISO(), 7);
+  save();
+}
+
+function deleteDue(id) {
+  const d = state.dues.find(item => item.id === id);
+  if (!d) return;
+  if (confirm(I18n.lang === "it-IT" ? `Eliminare la scadenza "${d.description}"?` : `Delete bill "${d.description}"?`)) {
+    state.dues = state.dues.filter(item => item.id !== id);
+    save();
+  }
+}
+
+function openEditDueModal(id) {
+  const d = state.dues.find(item => item.id === id);
+  if (!d) return;
+
+  document.getElementById("editDueId").value = d.id;
+  document.getElementById("editDueDescription").value = d.description;
+  document.getElementById("editDueAmount").value = (d.amount / 100).toFixed(2);
+  document.getElementById("editDueDate").value = d.date;
+  document.getElementById("editDueCategory").value = d.category;
+  document.getElementById("editDueFrequency").value = d.frequency || "none";
+
+  document.getElementById("editDueModal").style.display = "flex";
+}
+
+function saveEditedDue() {
+  const id = document.getElementById("editDueId").value;
+  const d = state.dues.find(item => item.id === id);
+  if (!d) return;
+
+  const desc = document.getElementById("editDueDescription").value.trim();
+  const amountVal = document.getElementById("editDueAmount").value;
+  const date = document.getElementById("editDueDate").value;
+
+  if (!desc || !amountVal || !date) return alert(I18n.lang === "it-IT" ? "Compila i campi." : "Fill in all fields.");
+
+  d.description = desc;
+  d.amount = euroToCents(amountVal);
+  d.date = date;
+  d.category = document.getElementById("editDueCategory").value;
+  d.frequency = document.getElementById("editDueFrequency").value;
+
+  closeModal("editDueModal");
+  save();
+}
+
+function markDuePaid(id) {
+  const d = state.dues.find(item => item.id === id);
+  if (!d) return;
+
+  const accountId = state.accounts[0]?.id;
+  if (!accountId) return alert(I18n.lang === "it-IT" ? "Crea prima un conto!" : "Please create an account first!");
+
+  state.transactions.push({
+    id: uid(), createdAt: Date.now(), accountId,
+    date: todayISO(), type: "expense", amount: d.amount,
+    category: d.category, tag: "#scadenza", description: d.description
+  });
+
+  const acc = state.accounts.find(a => a.id === accountId);
+  if (acc) acc.balanceCents -= d.amount;
+
+  d.status = "paid";
+  save();
+}
+
+function renderDues() {
+  const container = document.getElementById("dueList");
+  const plannedDues = state.dues.filter(d => d.status === "planned").sort((a,b) => a.date.localeCompare(b.date));
+
+  container.innerHTML = plannedDues.length ? plannedDues.map(d => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1.5px solid var(--border)">
+      <div>
+        <strong>${escapeHTML(d.description)}</strong>
+        <div class="muted">${escapeHTML(d.category)} · ${I18n.t("dueDate")}: ${dateLabel(d.date)}</div>
+      </div>
+      <div style="text-align:right;">
+        <strong class="negative">${money(d.amount)}</strong>
+        <div style="margin-top:6px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="small primary" onclick="markDuePaid('${d.id}')">${I18n.t("pay")}</button>
+          <button class="small" onclick="openEditDueModal('${d.id}')">${I18n.t("edit")}</button>
+          <button class="small danger" onclick="deleteDue('${d.id}')">${I18n.t("delete")}</button>
+        </div>
+      </div>
+    </div>
+  `).join("") : `<div class="empty">${I18n.t("noUpcomingDues")}</div>`;
+
+  const upcomingContainer = document.getElementById("upcoming");
+  if (upcomingContainer) {
+    upcomingContainer.innerHTML = plannedDues.slice(0, 4).map(d => `
+      <div style="display:flex; justify-content:space-between; padding: 8px 0; border-bottom: 1.5px solid var(--border)">
+        <div><strong>${escapeHTML(d.description)}</strong><div class="muted">${dateLabel(d.date)}</div></div>
+        <strong class="negative">${money(d.amount)}</strong>
+      </div>
+    `).join("") || `<div class='empty'>${I18n.t("noUpcomingDues")}</div>`;
+  }
+
+  const dueTotalEl = document.getElementById("dueTotal");
+  const dueCountEl = document.getElementById("dueCount");
+  if (dueTotalEl && dueCountEl) {
+    const totalDueAmount = plannedDues.reduce((sum, d) => sum + d.amount, 0);
+    dueTotalEl.textContent = money(totalDueAmount);
+    dueCountEl.textContent = plannedDues.length + " " + I18n.t("unpaidDues");
+  }
+}
+
+function submitGoalForm() {
+  const name = document.getElementById("goalName").value.trim();
+  const targetVal = document.getElementById("goalTarget").value;
+  const currentVal = document.getElementById("goalCurrent").value || "0";
+  if (!name || !targetVal) return alert(I18n.lang === "it-IT" ? "Compila i dati dell'obiettivo." : "Fill in goal details.");
+
+  state.goals.push({ id: uid(), name, targetCents: euroToCents(targetVal), currentCents: euroToCents(currentVal) });
+  document.getElementById("goalForm").reset();
+  save();
+}
+
+function deleteGoal(id) {
+  const g = state.goals.find(item => item.id === id);
+  if (!g) return;
+  if (confirm(I18n.lang === "it-IT" ? `Eliminare l'obiettivo "${g.name}"?` : `Delete goal "${g.name}"?`)) {
+    state.goals = state.goals.filter(item => item.id !== id);
+    save();
+  }
+}
+
+function openEditGoalModal(id) {
+  const g = state.goals.find(item => item.id === id);
+  if (!g) return;
+
+  document.getElementById("editGoalId").value = g.id;
+  document.getElementById("editGoalName").value = g.name;
+  document.getElementById("editGoalTarget").value = (g.targetCents / 100).toFixed(2);
+  document.getElementById("editGoalCurrent").value = (g.currentCents / 100).toFixed(2);
+
+  document.getElementById("editGoalModal").style.display = "flex";
+}
+
+function saveEditedGoal() {
+  const id = document.getElementById("editGoalId").value;
+  const g = state.goals.find(item => item.id === id);
+  if (!g) return;
+
+  const name = document.getElementById("editGoalName").value.trim();
+  const targetVal = document.getElementById("editGoalTarget").value;
+  const currentVal = document.getElementById("editGoalCurrent").value || "0";
+
+  if (!name || !targetVal) return alert(I18n.lang === "it-IT" ? "Compila i dati dell'obiettivo." : "Fill in goal details.");
+
+  g.name = name;
+  g.targetCents = euroToCents(targetVal);
+  g.currentCents = euroToCents(currentVal);
+
+  closeModal("editGoalModal");
+  save();
+}
+
+function renderGoals() {
+  const container = document.getElementById("goalsList");
+  container.innerHTML = state.goals.length ? state.goals.map(g => {
+    const perc = Math.min(100, Math.round((g.currentCents / g.targetCents) * 100));
+    return `
+      <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>${escapeHTML(g.name)}</strong>
+          <span>${money(g.currentCents)} / ${money(g.targetCents)} (${perc}%)</span>
+        </div>
+        <div class="bar"><div style="width: ${perc}%"></div></div>
+        <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:6px;">
+          <button class="small" onclick="openEditGoalModal('${g.id}')">${I18n.t("edit")}</button>
+          <button class="small danger" onclick="deleteGoal('${g.id}')">${I18n.t("delete")}</button>
+        </div>
+      </div>
+    `;
+  }).join("") : `<div class="empty">${I18n.t("noGoals")}</div>`;
+}
+
+function submitAccountForm() {
+  const name = document.getElementById("accName").value.trim();
+  const balanceVal = document.getElementById("accBalance").value;
+  if (!name || balanceVal === "") return alert(I18n.lang === "it-IT" ? "Compila i dati del conto." : "Fill in account details.");
+
+  state.accounts.push({ id: uid(), name, balanceCents: euroToCents(balanceVal) });
+  document.getElementById("accountForm").reset();
+  save();
+}
+
+function deleteAccount(id) {
+  const acc = state.accounts.find(a => a.id === id);
+  if (!acc) return;
+  if (confirm(I18n.lang === "it-IT" ? `Eliminare il conto "${acc.name}"?` : `Delete account "${acc.name}"?`)) {
+    state.accounts = state.accounts.filter(a => a.id !== id);
+    save();
+  }
+}
+
+function getTotalBalance() {
+  return state.accounts.reduce((sum, a) => sum + a.balanceCents, 0);
+}
+
+function renderAccounts() {
+  const container = document.getElementById("accountsList");
+  container.innerHTML = state.accounts.length ? state.accounts.map(a => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1.5px solid var(--border)">
+      <div><strong>${escapeHTML(a.name)}</strong></div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <strong class="${a.balanceCents >= 0 ? 'positive' : 'negative'}">${money(a.balanceCents)}</strong>
+        <button class="small danger" onclick="deleteAccount('${a.id}')">${I18n.t("delete")}</button>
+      </div>
+    </div>
+  `).join("") : `<div class="empty">${I18n.t("noAccounts")}</div>`;
+
+  const selectTx = document.getElementById("txAccount");
+  const selectFilter = document.getElementById("accountFilter");
+  
+  if (state.accounts.length) {
+    const options = state.accounts.map(a => `<option value="${a.id}">${escapeHTML(a.name)}</option>`).join("");
+    selectTx.innerHTML = options;
+    selectFilter.innerHTML = `<option value="">${I18n.t("filterAccount")}</option>` + options;
+  } else {
+    selectTx.innerHTML = `<option value="">${I18n.t("noAccounts")}</option>`;
+    selectFilter.innerHTML = `<option value="">${I18n.t("filterAccount")}</option>`;
+  }
+}
+
+function renderBudgetCategory() {
+  const container = document.getElementById("budgetCategoryList");
+  const currentMonth = document.getElementById("analyticsMonth").value || monthKey(todayISO());
+  const cats = I18n.getCategories().expense;
+
+  container.innerHTML = cats.map(cat => {
+    const limit = state.categoryLimits[cat] || 0;
+    const spent = state.transactions
+      .filter(t => t.type === 'expense' && t.category === cat && monthKey(t.date) === currentMonth)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const perc = limit ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
+    const isOver = limit && spent > limit;
+    const safeCat = encodeURIComponent(cat);
+
+    return `
+      <div style="padding: 12px 0; border-bottom: 1.5px solid var(--border)">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><strong>${escapeHTML(cat)}</strong></div>
+          <div>
+            <button class="small" onclick="setCategoryLimit('${safeCat}', ${limit})">${I18n.t("setLimit")}</button>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size: 13px; margin-top:6px;">
+          <span>${I18n.t("spentInMonth")} (${formatMonthYearLabel(currentMonth)}): <strong class="negative">${money(spent)}</strong></span>
+          <span>${I18n.t("limit")}: ${limit ? money(limit) : '—'}</span>
+        </div>
+        ${limit ? `
+          <div class="bar ${isOver ? 'danger' : ''}"><div style="width: ${perc}%"></div></div>
+        ` : ''}
+      </div>
+    `;
+  }).join("");
+}
+
+function setCategoryLimit(encodedCat, currentCents) {
+  const cat = decodeURIComponent(encodedCat);
+  const val = prompt(`${I18n.t("setLimit")} - ${cat}:`, currentCents ? (currentCents / 100).toFixed(2) : "");
+  if (val === null) return;
+  const trimmed = val.trim();
+  if (trimmed === "" || isNaN(Number(trimmed)) || Number(trimmed) <= 0) {
+    delete state.categoryLimits[cat];
+  } else {
+    state.categoryLimits[cat] = euroToCents(trimmed);
+  }
+  save();
+}
+
+function renderDashboard() {
+  const totalBalance = getTotalBalance();
+  const curBalEl = document.getElementById("currentBalance");
+  const foreBalEl = document.getElementById("forecastBalance");
+
+  curBalEl.textContent = money(totalBalance);
+  curBalEl.className = "value " + (totalBalance >= 0 ? "positive" : "negative");
+
+  foreBalEl.textContent = money(totalBalance);
+  foreBalEl.className = "value " + (totalBalance >= 0 ? "positive" : "negative");
+
+  document.getElementById("asOf").textContent = I18n.t("asOfToday");
+
+  renderDashboardMonthHistory();
+  renderQuickBudget();
+}
+
+function renderQuickBudget() {
+  const container = document.getElementById("quickBudget");
+  const curMonth = monthKey(todayISO());
+  const catsWithLimits = Object.keys(state.categoryLimits);
+
+  if (!catsWithLimits.length) {
+    container.innerHTML = `<div class="empty">${I18n.t("noBudgetLimits")}</div>`;
+    return;
+  }
+
+  container.innerHTML = catsWithLimits.map(cat => {
+    const limit = state.categoryLimits[cat];
+    const spent = state.transactions
+      .filter(t => t.type === 'expense' && t.category === cat && monthKey(t.date) === curMonth)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const remaining = limit - spent;
+    const perc = Math.min(100, Math.round((spent / limit) * 100));
+
+    return `
+      <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1.5px solid var(--border)">
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
+          <span>${escapeHTML(cat)}</span>
+          <span class="${remaining >= 0 ? 'positive' : 'negative'}">${I18n.t("remainingLabel")} ${money(remaining)}</span>
+        </div>
+        <div class="bar ${remaining < 0 ? 'danger' : ''}"><div style="width: ${perc}%"></div></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDashboardMonthHistory() {
+  const selKey = document.getElementById("overviewMonthFilter").value || monthKey(todayISO());
+  const mtx = state.transactions.filter(t => monthKey(t.date) === selKey);
+  const inc = mtx.filter(t => t.type === "income").reduce((s,t) => s + t.amount, 0);
+  const exp = mtx.filter(t => t.type === "expense").reduce((s,t) => s + t.amount, 0);
+  const net = inc - exp;
+
+  const startTransactions = state.transactions.filter(t => monthKey(t.date) < selKey);
+  const startBalanceCents = startTransactions.reduce((sum, t) => {
+    return sum + (t.type === "income" ? t.amount : -t.amount);
+  }, 0);
+
+  const endBalanceCents = startBalanceCents + net;
+
+  const startEl = document.getElementById("dashStartBalance");
+  const endEl = document.getElementById("dashEndBalance");
+
+  startEl.textContent = money(startBalanceCents);
+  startEl.className = "value " + (startBalanceCents >= 0 ? "positive" : "negative");
+
+  document.getElementById("dashMonthIncome").textContent = money(inc);
+  document.getElementById("dashMonthExpense").textContent = money(exp);
+
+  endEl.textContent = money(endBalanceCents);
+  endEl.className = "value " + (endBalanceCents >= 0 ? "positive" : "negative");
+}
+
+function renderAnalytics() {
+  const selected = document.getElementById("analyticsMonth").value || monthKey(todayISO());
+  const rows = state.transactions.filter(t => monthKey(t.date) === selected);
+  const income = rows.filter(t => t.type === "income").reduce((s,t) => s + t.amount, 0);
+  const expense = rows.filter(t => t.type === "expense").reduce((s,t) => s + t.amount, 0);
+  const diff = income - expense;
+
+  document.getElementById("aIncome").textContent = money(income);
+  document.getElementById("aExpense").textContent = money(expense);
+
+  const diffEl = document.getElementById("aDifference");
+  diffEl.textContent = money(diff);
+  diffEl.className = "value " + (diff >= 0 ? "positive" : "negative");
+
+  document.getElementById("aCount").textContent = rows.length;
+
+  const totalContainer = document.getElementById("totalChartContainer");
+  const categoryContainer = document.getElementById("categoryChartContainer");
+
+  if (income === 0 && expense === 0) {
+    totalContainer.innerHTML = `<div class="empty">${I18n.t("noDataMonth")}</div>`;
+    categoryContainer.innerHTML = `<div class="empty">${I18n.t("noDataMonth")}</div>`;
+  } else {
+    const maxValTotal = Math.max(income, expense, 100);
+    const incHeight1 = Math.max(8, Math.round((income / maxValTotal) * 120));
+    const expHeight1 = Math.max(8, Math.round((expense / maxValTotal) * 120));
+
+    totalContainer.innerHTML = `
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-color" style="background:var(--blue)"></div>${I18n.t("income")}</div>
+        <div class="legend-item"><div class="legend-color" style="background:var(--pink)"></div>${I18n.t("expense")}</div>
+      </div>
+      <svg width="200" height="210" viewBox="0 0 200 210" style="overflow:visible">
+        <line x1="10" y1="150" x2="190" y2="150" stroke="var(--border)" stroke-width="2" />
+        <rect x="35" y="${150 - incHeight1}" width="40" height="${incHeight1}" rx="8" fill="var(--blue)" />
+        <text x="55" y="${142 - incHeight1}" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text)">${money(income)}</text>
+        <text x="55" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="var(--muted)">${I18n.t("income")}</text>
+
+        <rect x="125" y="${150 - expHeight1}" width="40" height="${expHeight1}" rx="8" fill="var(--pink)" />
+        <text x="145" y="${142 - expHeight1}" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text)">${money(expense)}</text>
+        <text x="145" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="var(--muted)">${I18n.t("expense")}</text>
+      </svg>
+    `;
+
+    const categoryTotals = {};
+    rows.filter(t => t.type === "expense").forEach(t => {
+      categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+    });
+
+    const categoriesWithExpense = Object.keys(categoryTotals);
+    if (categoriesWithExpense.length === 0) {
+      categoryContainer.innerHTML = `<div class="empty">${I18n.t("noDataMonth")}</div>`;
+    } else {
+      let maxValCat = Math.max(...Object.values(categoryTotals), 100);
+      let items = categoriesWithExpense.map(c => ({ name: c, amount: categoryTotals[c] }));
+
+      const barWidth = 32;
+      const gap = 20;
+      const svgWidth = Math.max(300, items.length * (barWidth + gap) + 40);
+
+      let svgHtml = `<svg width="${svgWidth}" height="210" viewBox="0 0 ${svgWidth} 210" style="overflow:visible">`;
+      svgHtml += `<line x1="10" y1="150" x2="${svgWidth - 10}" y2="150" stroke="var(--border)" stroke-width="2" />`;
+
+      items.forEach((it, idx) => {
+        const x = 25 + idx * (barWidth + gap);
+        const h = Math.max(8, Math.round((it.amount / maxValCat) * 120));
+        const y = 150 - h;
+
+        svgHtml += `
+          <rect x="${x}" y="${y}" width="${barWidth}" height="${h}" rx="6" fill="var(--pink)" />
+          <text x="${x + barWidth/2}" y="${y - 6}" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--text)">${money(it.amount)}</text>
+          <g transform="translate(${x + barWidth/2}, 162)">
+            <text transform="rotate(45)" text-anchor="start" font-size="10" font-weight="600" fill="var(--muted)">${escapeHTML(it.name)}</text>
+          </g>
+        `;
+      });
+
+      svgHtml += `</svg>`;
+      categoryContainer.innerHTML = svgHtml;
+    }
+  }
+
+  const categoryAnalyticsContainer = document.getElementById("categoryAnalytics");
+  const categoryTotals = {};
+  rows.filter(t => t.type === "expense").forEach(t => {
+    categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+  });
+  const catEntries = Object.entries(categoryTotals).sort((a,b) => b[1] - a[1]);
+  categoryAnalyticsContainer.innerHTML = catEntries.length ? catEntries.map(([cat, amount]) => `
+    <div style="display:flex; justify-content:space-between; padding: 8px 0; border-bottom: 1.5px solid var(--border)">
+      <span>${escapeHTML(cat)}</span>
+      <strong class="negative">${money(amount)}</strong>
+    </div>
+  `).join("") : `<div class="empty">${I18n.t("noDataMonth")}</div>`;
+}
+
+function submitSettingsForm() {
+  const privacyChecked = document.getElementById("privacyConsent").checked;
+  if (!privacyChecked) return alert(I18n.lang === "it-IT" ? "Accetta l'informativa sulla privacy." : "Please accept privacy policy.");
+
+  state.horizon = Number(document.getElementById("horizon").value);
+  state.reserveCents = euroToCents(document.getElementById("reserve").value);
+  state.pin = document.getElementById("pinSetting").value.trim();
+  state.privacyAccepted = true;
+  save();
+  alert(I18n.lang === "it-IT" ? "Impostazioni salvate." : "Settings saved successfully.");
+}
+
+function exportPDF() {
+  try {
+    const totalBalance = getTotalBalance();
+    const plannedDues = state.dues.filter(d => d.status === "planned");
+    const totalDueAmount = plannedDues.reduce((sum, d) => sum + d.amount, 0);
+
+    document.getElementById("printDate").textContent = "Data report: " + new Date().toLocaleDateString(TRANSLATIONS[I18n.lang].locale);
+
+    document.getElementById("printOverviewContent").innerHTML = `
+      <p><strong>Saldo Totale Attuale:</strong> ${money(totalBalance)}</p>
+      <p><strong>Scadenze non pagate:</strong> ${money(totalDueAmount)} (${plannedDues.length} scadenze)</p>
+      <p><strong>Numero Conti Attivi:</strong> ${state.accounts.length}</p>
+    `;
+
+    const txList = [...state.transactions].sort((a,b) => b.date.localeCompare(a.date));
+    document.getElementById("printTransactionsContent").innerHTML = txList.length ? `
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="background:#f3e9f9;">
+            <th style="border:1px solid #ccc; padding:6px; text-align:left;">Data</th>
+            <th style="border:1px solid #ccc; padding:6px; text-align:left;">Descrizione</th>
+            <th style="border:1px solid #ccc; padding:6px; text-align:left;">Categoria</th>
+            <th style="border:1px solid #ccc; padding:6px; text-align:left;">Tag</th>
+            <th style="border:1px solid #ccc; padding:6px; text-align:right;">Importo</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${txList.map(t => `
+            <tr>
+              <td style="border:1px solid #ccc; padding:6px;">${dateLabel(t.date)}</td>
+              <td style="border:1px solid #ccc; padding:6px;">${escapeHTML(t.description || (t.type === 'income' ? 'Entrata' : 'Uscita'))}</td>
+              <td style="border:1px solid #ccc; padding:6px;">${escapeHTML(t.category)}</td>
+              <td style="border:1px solid #ccc; padding:6px;">${escapeHTML(t.tag || '')}</td>
+              <td style="border:1px solid #ccc; padding:6px; text-align:right; color:${t.type==='income'?'#2b6cb0':'#c53030'}">
+                ${t.type === 'income' ? '+' : '-'}${money(t.amount)}
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    ` : `<p>Nessun movimento registrato.</p>`;
+
+    window.print();
+  } catch (e) {
+    alert(I18n.lang === "it-IT" ? "Impossibile avviare il report PDF." : "Unable to generate PDF report.");
+  }
+}
+
+function resetApp() {
+  const msg = I18n.lang === "it-IT"
+    ? "Attenzione: questa funzione azzererà tutti i dati salvati e ripristinerà l'applicazione come al primo avvio. Vuoi procedere?"
+    : "Warning: this action will erase all saved data and reset the app to its initial state. Do you want to proceed?";
+  
+  if (confirm(msg)) {
+    state = emptyState();
+    localStorage.removeItem("pochette-app-v21");
+    localStorage.removeItem("pochette_activated");
+    render();
+    checkLicense();
+  }
+}
+
+function resetDemo() {
+  if (confirm(I18n.lang === "it-IT" ? "Vuoi davvero azzerare tutti i dati?" : "Do you really want to reset all data?")) {
+    state = emptyState();
+    save();
+    checkInitialState();
+  }
+}
+
+function render() {
+  I18n.updateDOM();
+  populateMonthSelects();
+  updateSuggestions();
+
+  document.getElementById("langSetting").value = I18n.lang;
+  document.getElementById("horizon").value = state.horizon;
+  document.getElementById("reserve").value = state.reserveCents ? (state.reserveCents / 100).toFixed(2) : "";
+  document.getElementById("pinSetting").value = state.pin || "";
+  document.getElementById("privacyConsent").checked = !!state.privacyAccepted;
+  document.getElementById("txDate").value ||= todayISO();
+  document.getElementById("dueDate").value ||= addDays(todayISO(), 7);
+
+  refreshCategories();
+  renderAccounts();
+  renderTransactions();
+  renderDues();
+  renderGoals();
+  renderBudgetCategory();
+  renderDashboard();
+  renderAnalytics();
+}
+
+ThemeManager.init();
+checkLicense();
+render();
+</script>
+</body>
+</html>
