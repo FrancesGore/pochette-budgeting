@@ -1771,7 +1771,6 @@ function resetApp() {
   if (confirm(msg)) {
     state = emptyState();
     localStorage.removeItem("pochette-app-v21");
-    localStorage.removeItem("pochette_activated");
     render();
     checkLicense();
   }
