@@ -1,0 +1,23 @@
+{
+"id": "/pochette-budgeting/",
+"name": "Pochette",
+"short_name": "Pochette",
+"description": "La tua app personale per gestire il budget",
+"start_url": "/pochette-budgeting/",
+"scope": "/pochette-budgeting/",
+"display": "standalone",
+"background_color": "#fff8f2",
+"theme_color": "#b87962",
+"icons": [
+{
+"src": "/pochette-budgeting/icons/icon-192.png",
+"sizes": "192x192",
+"type": "image/png"
+},
+{
+"src": "/pochette-budgeting/icons/icon-512.png",
+"sizes": "512x512",
+"type": "image/png"
+}
+]
+}
