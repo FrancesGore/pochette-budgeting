@@ -948,12 +948,6 @@ async function activateLicense() {
     return;
   }
 
-  if (!GOOGLE_SCRIPT_URL) {
-    msgEl.style.color = "var(--danger)";
-    msgEl.textContent = "Inserisci l'URL del tuo Google Script.";
-    return;
-  }
-
   btn.disabled = true;
   msgEl.style.color = "var(--muted)";
   msgEl.textContent = "Verifica del codice in corso...";
