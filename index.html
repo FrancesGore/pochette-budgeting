@@ -239,11 +239,6 @@ footer { margin: 32px 0 12px; color: var(--muted); font-size: 12px; text-align: 
     <p class="muted" style="margin-bottom:16px;">Inserisci il tuo codice di attivazione per sbloccare l'applicazione.</p>
     
     <input type="text" id="licenseKeyInput" placeholder="es. A1B2-C3D4" style="text-align:center; font-size:18px; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;" maxlength="20">
-    
-    <details style="margin-bottom:14px; text-align:left; font-size:12px; color:var(--muted);">
-      <summary style="cursor:pointer; font-weight:600;">Configura URL Google Apps Script</summary>
-      <input type="url" id="scriptUrlInput" placeholder="Incolla URL Web App Google Script" style="margin-top:8px; font-size:12px;">
-    </details>
 
     <button class="primary" style="width:100%; padding:12px; font-size:15px;" id="activateBtn" onclick="activateLicense()">Attiva Applicazione</button>
     <div id="licenseMsg" style="margin-top:12px; font-size:13px; font-weight:600;"></div>
